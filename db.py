@@ -8,7 +8,9 @@ load_dotenv()
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
 DB_NAME = 'dermai'
 
-client = MongoClient(MONGO_URI)
+# connect=False ensures no sockets are opened until the very first request
+# This is required for PyMongo > 4 when using Gunicorn with --preload
+client = MongoClient(MONGO_URI, connect=False)
 db = client[DB_NAME]
 
 users_collection = db['users']
@@ -29,5 +31,5 @@ def init_db():
         })
         print("Admin user created (admin@dermai.com / admin123)")
 
-# Call it once when imported
-init_db()
+# Call it manually if needed, do NOT execute at import time to preserve fork-safety
+# init_db()
