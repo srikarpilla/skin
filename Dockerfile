@@ -36,9 +36,15 @@ COPY . .
 # `app.py` is configured to look inside `frontend/dist`
 COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 
+# Suppress verbose TF logs and reduce startup memory overhead
+ENV TF_CPP_MIN_LOG_LEVEL=3
+ENV TF_ENABLE_ONEDNN_OPTS=0
+ENV MALLOC_ARENA_MAX=2
+
 # Render injects a PORT environment variable at runtime
 EXPOSE 10000
 
-# Specify how Gunicorn should efficiently run the app logic across CPU threads
-# Set timeout high so TensorFlow has ample time to load dynamically
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers", "1", "--timeout", "120", "app:app"]
+# --preload: loads the app ONCE then forks workers (saves ~300MB RAM vs each worker loading TF)
+# --timeout 180: gives TensorFlow enough time to initialize on cold start
+# --workers 1: single worker to stay within free-tier 512MB RAM
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers", "1", "--timeout", "180", "--preload", "app:app"]
