@@ -29,8 +29,26 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Download model weights from HuggingFace Space (too large for GitHub's 100MB limit)
+# The Space srikarp/dermaAI holds the real trained weights
+RUN python -c "\
+from huggingface_hub import hf_hub_download; \
+import shutil; \
+path = hf_hub_download(repo_id='srikarp/dermaAI', filename='best_weights.weights.h5', repo_type='space'); \
+shutil.copy(path, '/app/best_weights.weights.h5'); \
+print('Model weights downloaded successfully')"
+
 # Copy backend python code, ML models, and reference logic
 COPY . .
+
+# Overwrite the LFS pointer (if any) with the real downloaded weights
+RUN if [ -f /app/best_weights.weights.h5 ]; then \
+      SIZE=$(stat -c%s /app/best_weights.weights.h5); \
+      echo "Weights file size: $SIZE bytes"; \
+      if [ "$SIZE" -lt 1000000 ]; then \
+        echo "ERROR: weights file looks like an LFS pointer stub!" && exit 1; \
+      fi; \
+    fi
 
 # Securely copy the Production Ready files from Phase 1 into Flask's reach
 # `app.py` is configured to look inside `frontend/dist`
