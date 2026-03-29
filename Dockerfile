@@ -1,7 +1,7 @@
 # ==========================================
 # Phase 1: Compile the React UI
 # ==========================================
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 # Install dependencies (only copy package.json first for cache optimization)
