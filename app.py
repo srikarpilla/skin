@@ -58,6 +58,12 @@ SYMPTOMS_PATH    = os.path.join(BASE_DIR, "symptoms.json")
 MEDICINES_PATH   = os.path.join(BASE_DIR, "medicines.json")
 IMG_SIZE         = (224, 224)
 
+# Safe defaults — app starts even if model fails to load
+model = None
+class_names = []
+DISEASE_SYMPTOMS = {}
+MEDICINES_DB = {}
+
 print("Loading model architecture...")
 try:
     with open(ARCH_PATH, 'r', encoding='utf-8') as f:
@@ -79,6 +85,8 @@ try:
     print(f"✅ Model loaded! {len(class_names)} classes ready.")
 except Exception as e:
     print(f"⚠️ Error loading model: {e}")
+    import traceback
+    traceback.print_exc()
 
 def preprocess_image(img_bytes):
     img = Image.open(io.BytesIO(img_bytes)).convert('RGB').resize(IMG_SIZE)
@@ -152,6 +160,8 @@ def login():
 @jwt_required()
 def predict():
     try:
+        if model is None:
+            return jsonify({"error": "Model not loaded. Server may still be initializing."}), 503
         current_user = json.loads(get_jwt_identity())
         if 'file' not in request.files:
             return jsonify({"error": "No file uploaded"}), 400
