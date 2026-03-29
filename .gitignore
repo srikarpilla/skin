@@ -1,0 +1,27 @@
+# ── Environment & Secrets ──────────────────────────────────────────────────
+.env
+*.env
+
+# ── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+# NOTE: *.pkl and *.h5 are intentionally NOT ignored so that ML model files
+# (symptom_rbm.pkl, best_weights.weights.h5, model_architecture.json)
+# are committed to the repo and available during Docker build on Render.
+
+# ── Encrypted upload artifacts (old local storage) ─────────────────────────
+static/uploads/
+*.enc
+
+# ── Node / Frontend ─────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+
+# ── OS & Editor noise ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
