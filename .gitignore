@@ -1,0 +1,31 @@
+# ── Environment & Secrets ──────────────────────────────────────────────────
+.env
+*.env
+
+# ── Python ─────────────────────────────────────────────────────────────────
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+# NOTE: *.pkl and *.h5 are intentionally NOT ignored so that ML model files
+# (symptom_rbm.pkl, model_architecture.json) are committed to the repo.
+# EXCEPTION: best_weights.weights.h5 is 159MB (exceeds GitHub 100MB limit)
+# — it is downloaded from HuggingFace (srikarp/dermaAI) during Docker build.
+best_weights.weights.h5
+
+# ── Encrypted upload artifacts (old local storage) ─────────────────────────
+static/uploads/
+*.enc
+
+# ── Node / Frontend ─────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+
+# ── OS & Editor noise ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
